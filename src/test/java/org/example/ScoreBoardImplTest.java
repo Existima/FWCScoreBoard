@@ -3,6 +3,7 @@ package org.example;
 import org.example.exceptions.InvalidGameNameException;
 import org.example.exceptions.InvalidScoreException;
 import org.example.exceptions.StartFinishGameException;
+import org.example.internal.ScoreBoardImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

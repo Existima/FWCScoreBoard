@@ -1,10 +1,15 @@
-package org.example;
+package org.example.model;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Represents a sports game between two teams.
+ * A game includes information about the home and away teams, their respective scores,
+ * and the time the game started.
+ * Instances of this class are immutable once created.
+ */
 public class Game {
-//todo make record + make class score (mutable)
     private final String homeTeam;
     private final String awayTeam;
     private final int homeScore;
@@ -22,14 +27,6 @@ public class Game {
         this.awayScore = awayScore;
         this.started = LocalDateTime.now();
     }
-
-//    public void setHomeScore(int score) {
-//        this.homeScore = score;
-//    }
-//
-//    public void setAwayScore(int score) {
-//        this.awayScore = score;
-//    }
 
     public String getHomeTeam() {
         return homeTeam;
