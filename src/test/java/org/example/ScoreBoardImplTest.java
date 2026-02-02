@@ -2,11 +2,13 @@ package org.example;
 
 import org.example.exceptions.InvalidGameNameException;
 import org.example.exceptions.InvalidScoreException;
+import org.example.exceptions.StartFinishGameException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class ScoreBoardImplTest {
 
@@ -26,16 +28,19 @@ class ScoreBoardImplTest {
     void shouldStartNewGame() {
         //when
         scoreBoard.startGame(homeTeam, awayTeam);
+
         //then
         assertEquals(1, scoreBoard.getSummary().size());
         assertEquals("Mexico", scoreBoard.getSummary().getLast().getHomeTeam());
         assertEquals("USA", scoreBoard.getSummary().getLast().getAwayTeam());
         assertEquals(0, scoreBoard.getSummary().getLast().getHomeScore());
         assertEquals(0, scoreBoard.getSummary().getLast().getAwayScore());
+        assertNotNull(scoreBoard.getSummary().getFirst().getStarted());
+        assertFalse(scoreBoard.getSummary().getFirst().getStarted().isAfter(LocalDateTime.now()));
     }
 
     @Test
-    void shouldNotStartNewGameIfNameIsEmptyOrNull() {
+    void shouldNotStartNewGameIfNamesIsEmptyOrNull() {
         //then
         assertThrows(InvalidGameNameException.class,
                 () -> scoreBoard.startGame("", null));
@@ -49,7 +54,19 @@ class ScoreBoardImplTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenGameIsStarted(){
+        //given
+        //when
+        scoreBoard.startGame(homeTeam,awayTeam);
+        //then
+        assertThrows(StartFinishGameException.class,
+                () -> scoreBoard.startGame(homeTeam,awayTeam));
+    }
+
+    @Test
     void shouldFinishGameByNames() {
+        //given
+        scoreBoard.startGame(homeTeam, awayTeam);
         //when
         scoreBoard.finishGame(homeTeam, awayTeam);
         //then
@@ -57,12 +74,12 @@ class ScoreBoardImplTest {
     }
 
     @Test
-    void shouldNotFinishGameWithWrongName() {
+    void shouldThrowExceptionWhenIsNoGameCanBeFinished() {
         //given
         scoreBoard.startGame(homeTeam, awayTeam);
-        //when
-        scoreBoard.finishGame(homeTeam, "wrong name");
         //then
+        assertThrows(StartFinishGameException.class,
+                () -> scoreBoard.finishGame("wrong name", awayTeam));
         assertEquals(1, scoreBoard.getSummary().size());
     }
 
@@ -104,9 +121,10 @@ class ScoreBoardImplTest {
     }
 
     @Test
-    void getSummary() {
+    void getSummary() throws InterruptedException {
         //given
         scoreBoard.startGame("England", "Italy");
+        Thread.sleep(10); // in this particular test case timestamp can have a tie;
         scoreBoard.startGame("Germany", "France");
         scoreBoard.startGame("Poland", "Greece");
         scoreBoard.startGame("Ukraine", "Spain");

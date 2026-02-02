@@ -7,25 +7,29 @@ public class Game {
 //todo make record + make class score (mutable)
     private final String homeTeam;
     private final String awayTeam;
-    private int homeScore;
-    private int awayScore;
+    private final int homeScore;
+    private final int awayScore;
     private final LocalDateTime started;
 
     public Game(String homeTeam, String awayTeam) {
+        this(homeTeam, awayTeam, 0, 0);
+    }
+
+    public Game(String homeTeam, String awayTeam, int homeScore, int awayScore) {
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
-        this.homeScore = 0;
-        this.awayScore = 0;
+        this.homeScore = homeScore;
+        this.awayScore = awayScore;
         this.started = LocalDateTime.now();
     }
 
-    public void setHomeScore(int score) {
-        this.homeScore = score;
-    }
-
-    public void setAwayScore(int score) {
-        this.awayScore = score;
-    }
+//    public void setHomeScore(int score) {
+//        this.homeScore = score;
+//    }
+//
+//    public void setAwayScore(int score) {
+//        this.awayScore = score;
+//    }
 
     public String getHomeTeam() {
         return homeTeam;
