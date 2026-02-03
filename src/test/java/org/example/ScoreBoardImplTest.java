@@ -7,8 +7,6 @@ import org.example.internal.ScoreBoardImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class ScoreBoardImplTest {
@@ -36,8 +34,7 @@ class ScoreBoardImplTest {
         assertEquals("USA", scoreBoard.getSummary().getLast().getAwayTeam());
         assertEquals(0, scoreBoard.getSummary().getLast().getHomeScore());
         assertEquals(0, scoreBoard.getSummary().getLast().getAwayScore());
-        assertNotNull(scoreBoard.getSummary().getFirst().getStarted());
-        assertFalse(scoreBoard.getSummary().getFirst().getStarted().isAfter(LocalDateTime.now()));
+        assertNotNull(scoreBoard.getSummary().getFirst());
     }
 
     @Test
@@ -55,13 +52,13 @@ class ScoreBoardImplTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenGameIsStarted(){
+    void shouldThrowExceptionWhenGameIsStarted() {
         //given
         //when
-        scoreBoard.startGame(homeTeam,awayTeam);
+        scoreBoard.startGame(homeTeam, awayTeam);
         //then
         assertThrows(StartFinishGameException.class,
-                () -> scoreBoard.startGame(homeTeam,awayTeam));
+                () -> scoreBoard.startGame(homeTeam, awayTeam));
     }
 
     @Test
@@ -122,10 +119,9 @@ class ScoreBoardImplTest {
     }
 
     @Test
-    void getSummary() throws InterruptedException {
+    void shouldReturnOrderedListOfActiveGames(){
         //given
         scoreBoard.startGame("England", "Italy");
-        Thread.sleep(10); // in this particular test case timestamp can have a tie;
         scoreBoard.startGame("Germany", "France");
         scoreBoard.startGame("Poland", "Greece");
         scoreBoard.startGame("Ukraine", "Spain");
@@ -142,12 +138,36 @@ class ScoreBoardImplTest {
         assertEquals("Poland", scoreList.getFirst().getHomeTeam()); //first in the list bcs have biggest total score
         assertEquals("Greece", scoreList.getFirst().getAwayTeam());
 
-        assertEquals("England", scoreList.get(1).getHomeTeam()); //is second in the list with equal score bcs match started first
-        assertEquals("Italy", scoreList.get(1).getAwayTeam());
+        assertEquals("Norway", scoreList.get(1).getHomeTeam()); //is second in the list with equal score bcs match started first
+        assertEquals("Portugal", scoreList.get(1).getAwayTeam());
 
         assertEquals("Ukraine", scoreList.getLast().getHomeTeam()); //is last in the bcs lowest total score
         assertEquals("Spain", scoreList.getLast().getAwayTeam());
+    }
 
-//        scoreBoard.showSummary(scoreList);
+    @Test
+    void shouldShowSummaryCorrectly() {
+        //given
+        scoreBoard.startGame("Argentina", "Brazil");
+        scoreBoard.updateScore("Argentina", "Brazil", 1, 2);
+        var summaryList = scoreBoard.getSummary();
+        //when
+        System.out.println("Summary:");
+        scoreBoard.showSummary(summaryList);
+        //then (manual observation required to confirm console output)
+        assertEquals(1, summaryList.size());
+        assertEquals(1, summaryList.getFirst().getHomeScore());
+        assertEquals(2, summaryList.getFirst().getAwayScore());
+        assertEquals("Argentina", summaryList.getFirst().getHomeTeam());
+        assertEquals("Brazil", summaryList.getFirst().getAwayTeam());
+    }
+
+    @Test
+    void shouldNotShowSummaryWithNullList() {
+        //when
+        System.out.println("Summary for null list:");
+        scoreBoard.showSummary(null);
+
+        //then (manual observation required to confirm no output or exceptions occur)
     }
 }

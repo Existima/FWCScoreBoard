@@ -1,10 +1,10 @@
 package org.example.internal;
 
-import org.example.model.Game;
 import org.example.api.ScoreBoard;
 import org.example.exceptions.InvalidGameNameException;
 import org.example.exceptions.InvalidScoreException;
 import org.example.exceptions.StartFinishGameException;
+import org.example.model.Game;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -14,17 +14,18 @@ import java.util.stream.Collectors;
 
 public class ScoreBoardImpl implements ScoreBoard {
 
-
     private final Map<String, Game> gamesBoard = new HashMap<>();
+    private static long id = 1;
 
     /**
-     * Starts a new game by adding it to the scoreboard with the given teams.
-     * If the game is already started, an exception will be thrown.
+     * Initiates a new game on the scoreboard by adding it with the provided home and away teams.
+     * The method validates the team names to ensure they are not null or empty.
+     * If a game already exists on the scoreboard with the same teams, an exception is thrown.
      *
      * @param homeTeam the name of the home team. Must not be null or empty.
      * @param awayTeam the name of the away team. Must not be null or empty.
-     * @throws InvalidGameNameException if the name of any team is null or blank.
-     * @throws StartFinishGameException if the game is already started with the same teams.
+     * @throws InvalidGameNameException if either team name is null or empty.
+     * @throws StartFinishGameException if the game with the provided teams is already active.
      */
     @Override
     public void startGame(String homeTeam, String awayTeam) {
@@ -33,7 +34,8 @@ public class ScoreBoardImpl implements ScoreBoard {
         if (gamesBoard.containsKey(key)) {
             throw new StartFinishGameException("Game already started");
         } else {
-            gamesBoard.put(key, new Game(homeTeam, awayTeam));
+            gamesBoard.put(key, new Game(homeTeam, awayTeam, id));
+            id++;
         }
     }
 
@@ -62,15 +64,17 @@ public class ScoreBoardImpl implements ScoreBoard {
 
     /**
      * Updates the score of an active game on the scoreboard.
-     * The game is identified using the names of the home and away teams.
-     * Throws an exception if the scores are invalid or if the game is not found.
+     * The method validates the provided scores to ensure they are non-negative integers
+     * and validates the team names to confirm they are not null or blank.
+     * If the game is not found on the scoreboard, an exception is thrown.
      *
-     * @param homeTeam the name of the home team. Must not be null or empty.
-     * @param awayTeam the name of the away team. Must not be null or empty.
+     * @param homeTeam the name of the home team. Must not be null or blank.
+     * @param awayTeam the name of the away team. Must not be null or blank.
      * @param homeScore the new score of the home team. Must be a non-negative integer.
      * @param awayScore the new score of the away team. Must be a non-negative integer.
-     * @throws InvalidScoreException if either score is negative.
-     * @throws InvalidGameNameException if the game with the specified teams does not exist on the scoreboard.
+     * @throws InvalidScoreException if any of the provided scores are negative.
+     * @throws InvalidGameNameException if either of the team names are null or blank,
+     *                                   or if the game does not exist on the scoreboard.
      */
     @Override
     public void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore) {
@@ -80,7 +84,7 @@ public class ScoreBoardImpl implements ScoreBoard {
         validateNames(homeTeam, awayTeam);
         String key = generateGameKey(homeTeam, awayTeam);
         if (gamesBoard.containsKey(key)) {
-            Game updatedGame = new Game(homeTeam, awayTeam, homeScore, awayScore);
+            Game updatedGame = new Game(gamesBoard.get(key), homeScore, awayScore);
             gamesBoard.put(key, updatedGame);
         } else {
             throw new InvalidGameNameException("No such game in the list");
@@ -88,12 +92,10 @@ public class ScoreBoardImpl implements ScoreBoard {
     }
 
     /**
-     * Retrieves a summary of all active games on the scoreboard.
-     * The games are sorted by their combined score in descending order.
-     * If two games have the same combined score, they are further sorted
-     * by their start time in descending order.
+     * Retrieves a summary of all active games on the scoreboard, sorted by total score in descending order.
+     * If two games have the same total score, they are further sorted by their unique IDs in descending order.
      *
-     * @return a list of active games, sorted by combined score and start time.
+     * @return a list of {@code Game} objects representing the sorted summary of active games.
      */
     @Override
     public List<Game> getSummary() {
@@ -101,10 +103,36 @@ public class ScoreBoardImpl implements ScoreBoard {
                 .stream()
                 .sorted(Comparator
                         .comparingInt((Game game) -> game.getAwayScore() + game.getHomeScore())
-                        .thenComparing(Game::getStarted).reversed())
+                        .thenComparing(Game::getId).reversed())
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Displays a summary of games by iterating through the provided list of games.
+     * For each game, it prints details including the home team, home team score,
+     * away team, and away team score in a formatted output.
+     *
+     * @param list the list of {@code Game} objects to display. If the list is null, the method does nothing.
+     */
+    public void showSummary(List<Game> list){
+        if(list == null){
+            return;
+        }
+        for (Game game : list){
+            System.out.printf("%s %d - %s %d%n",
+                    game.getHomeTeam(), game.getHomeScore(),
+                    game.getAwayTeam(), game.getAwayScore());
+        }
+    }
+
+    /**
+     * Generates a unique key for a game based on the names of the home and away teams.
+     * The key is created by concatenating the team names with a hyphen.
+     *
+     * @param homeTeam the name of the home team. Must not be null or empty.
+     * @param awayTeam the name of the away team. Must not be null or empty.
+     * @return a string representing the unique key for the game.
+     */
     private String generateGameKey(String homeTeam, String awayTeam) {
         return homeTeam + "-" + awayTeam;
     }
@@ -123,9 +151,4 @@ public class ScoreBoardImpl implements ScoreBoard {
         }
     }
 
-//    public void showSummary(List<Game> list){
-//        for (Game game : list){
-//            System.out.println(game.getHomeTeam() + " " + game.getHomeScore() + " - " + game.getAwayTeam() + " " + game.getAwayScore());
-//        }
-//    }
 }
