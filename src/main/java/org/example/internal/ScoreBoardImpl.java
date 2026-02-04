@@ -108,24 +108,6 @@ public class ScoreBoardImpl implements ScoreBoard {
     }
 
     /**
-     * Displays a summary of games by iterating through the provided list of games.
-     * For each game, it prints details including the home team, home team score,
-     * away team, and away team score in a formatted output.
-     *
-     * @param list the list of {@code Game} objects to display. If the list is null, the method does nothing.
-     */
-    public void showSummary(List<Game> list){
-        if(list == null){
-            return;
-        }
-        for (Game game : list){
-            System.out.printf("%s %d - %s %d%n",
-                    game.getHomeTeam(), game.getHomeScore(),
-                    game.getAwayTeam(), game.getAwayScore());
-        }
-    }
-
-    /**
      * Generates a unique key for a game based on the names of the home and away teams.
      * The key is created by concatenating the team names with a hyphen.
      *

@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.api.ScoreBoard;
 import org.example.internal.ScoreBoardImpl;
 import org.example.model.Game;
 
@@ -27,7 +28,7 @@ public final class ScoreBoardDemo {
 
     public static void main(String[] args) {
 
-        ScoreBoardImpl scoreBoard = new ScoreBoardImpl();
+        ScoreBoard scoreBoard = new ScoreBoardImpl();
         scoreBoard.startGame("Mexico", "Canada");
         scoreBoard.updateScore("Mexico", "Canada", 0, 5);
         scoreBoard.startGame("Spain", "Brazil");
@@ -40,10 +41,31 @@ public final class ScoreBoardDemo {
         scoreBoard.updateScore("Argentina", "Australia", 3, 1);
 
         List<Game> games = scoreBoard.getSummary();
-        scoreBoard.showSummary(games);
+        showSummary(games);
+
+        System.out.println("After finishing game:");
 
         scoreBoard.finishGame("Mexico", "Canada");
         games = scoreBoard.getSummary();
-        scoreBoard.showSummary(games);
+        showSummary(games);
+    }
+
+    /**
+     * Displays a summary of the given list of games, including each game's home team, away team,
+     * home score, and away score, formatted in a specific structure.
+     * If the list is null, the method exits without performing any operation.
+     *
+     * @param list the list of games to display. Each game contains information about the home team,
+     *             away team, home score, and away score.
+     */
+    public static void showSummary(List<Game> list){
+        if(list == null){
+            return;
+        }
+        for (Game game : list){
+            System.out.printf("%s %d - %s %d%n",
+                    game.getHomeTeam(), game.getHomeScore(),
+                    game.getAwayTeam(), game.getAwayScore());
+        }
     }
 }

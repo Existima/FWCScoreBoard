@@ -144,30 +144,4 @@ class ScoreBoardImplTest {
         assertEquals("Ukraine", scoreList.getLast().getHomeTeam()); //is last in the bcs lowest total score
         assertEquals("Spain", scoreList.getLast().getAwayTeam());
     }
-
-    @Test
-    void shouldShowSummaryCorrectly() {
-        //given
-        scoreBoard.startGame("Argentina", "Brazil");
-        scoreBoard.updateScore("Argentina", "Brazil", 1, 2);
-        var summaryList = scoreBoard.getSummary();
-        //when
-        System.out.println("Summary:");
-        scoreBoard.showSummary(summaryList);
-        //then (manual observation required to confirm console output)
-        assertEquals(1, summaryList.size());
-        assertEquals(1, summaryList.getFirst().getHomeScore());
-        assertEquals(2, summaryList.getFirst().getAwayScore());
-        assertEquals("Argentina", summaryList.getFirst().getHomeTeam());
-        assertEquals("Brazil", summaryList.getFirst().getAwayTeam());
-    }
-
-    @Test
-    void shouldNotShowSummaryWithNullList() {
-        //when
-        System.out.println("Summary for null list:");
-        scoreBoard.showSummary(null);
-
-        //then (manual observation required to confirm no output or exceptions occur)
-    }
 }

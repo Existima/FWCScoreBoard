@@ -1,5 +1,5 @@
 # FWCScoreBoard
-version = 1.0.3
+version = 1.0.4
 
 Football World Cup Scoreboard is a library that displays matches and scores.
 
@@ -11,4 +11,4 @@ A Game object uses an in-memory store (a HashMap), which means each new instance
 To satisfy the second requirement—retrieving games in a specific order—the Game class contains an id field. This field is auto-incremented whenever a new game is started on the scoreboard. After sorting current games by total score, games with the same total are ordered by recency, with the most recently added first.
 Edge-case tests show that using Date/Time or Instant instead of id is not reliable. When two or more games are started at the same time, their timestamp values can be equal, which can lead to race conditions: the summary may not consistently return the same order.
 
-Additional method showSummary() inside ScoreBoardImpl simply created for demonstration scoreboard main operations. His structure is representing all information as the last requirement ask.
+Additional method showSummary() inside ScoreBoardDemo simply created for demonstration scoreboard main operations. His structure is representing all information as the last requirement ask.
