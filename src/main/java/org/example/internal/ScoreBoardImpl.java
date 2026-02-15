@@ -1,22 +1,27 @@
 package org.example.internal;
 
 import org.example.api.ScoreBoard;
+import org.example.api.ScoreBoardConfig;
 import org.example.exceptions.InvalidGameNameException;
 import org.example.exceptions.InvalidScoreException;
 import org.example.exceptions.StartFinishGameException;
 import org.example.model.Game;
 
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ScoreBoardImpl implements ScoreBoard {
 
-    private final Map<String, Game> gamesBoard = new HashMap<>();
-    private static long id = 1;
+    private final ScoreBoardConfig<String, Game> scoreBoardConfig;
+//    private static long id = 1;
 
+    public ScoreBoardImpl(ScoreBoardConfig config) {
+        this.scoreBoardConfig = config;
+    }
+
+    public ScoreBoardImpl() {
+        this(ScoreBoardConfig.defaultBoardConfig());
+    }
     /**
      * Initiates a new game on the scoreboard by adding it with the provided home and away teams.
      * The method validates the team names to ensure they are not null or empty.
@@ -31,11 +36,11 @@ public class ScoreBoardImpl implements ScoreBoard {
     public void startGame(String homeTeam, String awayTeam) {
         validateNames(homeTeam, awayTeam);
         String key = generateGameKey(homeTeam, awayTeam);
-        if (gamesBoard.containsKey(key)) {
+        if (scoreBoardConfig.getDataSource().contains(key)) {
             throw new StartFinishGameException("Game already started");
         } else {
-            gamesBoard.put(key, new Game(homeTeam, awayTeam, id));
-            id++;
+            scoreBoardConfig.getDataSource().put(key, new Game(homeTeam, awayTeam, scoreBoardConfig.getIdGenerator().get()));
+            scoreBoardConfig.getIdGenerator().increment();
         }
     }
 
@@ -55,10 +60,10 @@ public class ScoreBoardImpl implements ScoreBoard {
     public void finishGame(String homeTeam, String awayTeam) {
         validateNames(homeTeam, awayTeam);
         String key = generateGameKey(homeTeam, awayTeam);
-        if (!gamesBoard.containsKey(key)) {
+        if (!scoreBoardConfig.getDataSource().contains(key)) {
             throw new StartFinishGameException("There is no such game in the list");
         } else {
-            gamesBoard.remove(key);
+            scoreBoardConfig.getDataSource().remove(key);
         }
     }
 
@@ -83,9 +88,9 @@ public class ScoreBoardImpl implements ScoreBoard {
         }
         validateNames(homeTeam, awayTeam);
         String key = generateGameKey(homeTeam, awayTeam);
-        if (gamesBoard.containsKey(key)) {
-            Game updatedGame = new Game(gamesBoard.get(key), homeScore, awayScore);
-            gamesBoard.put(key, updatedGame);
+        if (scoreBoardConfig.getDataSource().contains(key)) {
+            Game updatedGame = new Game(scoreBoardConfig.getDataSource().get(key), homeScore, awayScore);
+            scoreBoardConfig.getDataSource().put(key, updatedGame);
         } else {
             throw new InvalidGameNameException("No such game in the list");
         }
@@ -99,11 +104,10 @@ public class ScoreBoardImpl implements ScoreBoard {
      */
     @Override
     public List<Game> getSummary() {
-        return gamesBoard.values()
+        return scoreBoardConfig.getDataSource()
+                .getAll()
                 .stream()
-                .sorted(Comparator
-                        .comparingInt((Game game) -> game.getAwayScore() + game.getHomeScore())
-                        .thenComparing(Game::getId).reversed())
+                .sorted(scoreBoardConfig.getComparator())
                 .collect(Collectors.toList());
     }
 

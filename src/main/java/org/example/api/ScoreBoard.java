@@ -19,3 +19,4 @@ public interface ScoreBoard {
 
     List<Game> getSummary();
 }
+//todo replace parameters to Object
