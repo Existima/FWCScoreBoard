@@ -1,7 +1,7 @@
 package org.example.internal;
 
 import org.example.api.ScoreBoard;
-import org.example.api.ScoreBoardConfig;
+import org.example.service.ScoreBoardConfig;
 import org.example.exceptions.InvalidGameNameException;
 import org.example.exceptions.InvalidScoreException;
 import org.example.exceptions.StartFinishGameException;
@@ -13,15 +13,15 @@ import java.util.stream.Collectors;
 public class ScoreBoardImpl implements ScoreBoard {
 
     private final ScoreBoardConfig<String, Game> scoreBoardConfig;
-//    private static long id = 1;
 
     public ScoreBoardImpl(ScoreBoardConfig config) {
         this.scoreBoardConfig = config;
     }
 
     public ScoreBoardImpl() {
-        this(ScoreBoardConfig.defaultBoardConfig());
+        this(ScoreBoardConfig.builder().build());
     }
+
     /**
      * Initiates a new game on the scoreboard by adding it with the provided home and away teams.
      * The method validates the team names to ensure they are not null or empty.
@@ -73,13 +73,13 @@ public class ScoreBoardImpl implements ScoreBoard {
      * and validates the team names to confirm they are not null or blank.
      * If the game is not found on the scoreboard, an exception is thrown.
      *
-     * @param homeTeam the name of the home team. Must not be null or blank.
-     * @param awayTeam the name of the away team. Must not be null or blank.
+     * @param homeTeam  the name of the home team. Must not be null or blank.
+     * @param awayTeam  the name of the away team. Must not be null or blank.
      * @param homeScore the new score of the home team. Must be a non-negative integer.
      * @param awayScore the new score of the away team. Must be a non-negative integer.
-     * @throws InvalidScoreException if any of the provided scores are negative.
+     * @throws InvalidScoreException    if any of the provided scores are negative.
      * @throws InvalidGameNameException if either of the team names are null or blank,
-     *                                   or if the game does not exist on the scoreboard.
+     *                                  or if the game does not exist on the scoreboard.
      */
     @Override
     public void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore) {

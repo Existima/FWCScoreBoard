@@ -1,4 +1,4 @@
-package org.example.api;
+package org.example.service;
 
 public interface IdGenerator {
     long get();
