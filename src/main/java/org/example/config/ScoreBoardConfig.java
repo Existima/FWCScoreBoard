@@ -1,10 +1,21 @@
-package org.example.service;
+package org.example.config;
 
 import org.example.model.Game;
+import org.example.service.*;
 
 import java.util.Comparator;
-import java.util.concurrent.atomic.AtomicLong;
 
+
+/**
+ * The {@code ScoreBoardConfig} class provides configuration settings
+ * for a scoreboard system. It allows you to define a data source,
+ * a game comparator for sorting or ranking games, and an ID generator
+ * to produce unique identifiers. This class supports a builder pattern
+ * for customization and default configurations.
+ *
+ * @param <E> the key type used in the data source
+ * @param <T> the value type used in the data source
+ */
 public class ScoreBoardConfig<E, T> {
     private final DataSource<E, T> dataSource;
     private final Comparator<Game> comparator;
@@ -97,20 +108,6 @@ public class ScoreBoardConfig<E, T> {
                 this.dataSource = ds;
             }
             return new ScoreBoardConfig<>(dataSource, comparator, idGenerator);
-        }
-    }
-
-    private static final class DefaultIdGenerator implements IdGenerator {
-        private final AtomicLong seq = new AtomicLong(0);
-
-        @Override
-        public long get() {
-            return seq.get();
-        }
-
-        @Override
-        public void increment() {
-            seq.incrementAndGet();
         }
     }
 }

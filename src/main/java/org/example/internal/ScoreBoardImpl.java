@@ -1,7 +1,7 @@
 package org.example.internal;
 
 import org.example.api.ScoreBoard;
-import org.example.service.ScoreBoardConfig;
+import org.example.config.ScoreBoardConfig;
 import org.example.exceptions.InvalidGameNameException;
 import org.example.exceptions.InvalidScoreException;
 import org.example.exceptions.StartFinishGameException;
